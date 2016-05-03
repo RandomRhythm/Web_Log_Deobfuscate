@@ -1,5 +1,5 @@
 #Input a log file that contains encoded text
-#this script will replace hex (0x), ASCII, and Unicode percent encoded characters and interpreted CHAR() commands. 
+#this script will replace hex (0x), ASCII, Unicode percent encoded characters, and interpreted CHAR() commands. 
 
 #Copyright (c) 2016 Ryan Boyle randomrhythm@rhythmengineering.com.
 #Copyright (c) 2012 Jenny Qian.
