@@ -155,6 +155,14 @@ def replaceChar(strEURL):
         strReturnWithChars = strEURL
     return strReturnWithChars
 
+def replaceString(strInputLine, strMatchText, strReplace):
+    strReplaceReturn = strInputLine
+    strManipulate = strInputLine[:-2]#dont match EOL chars
+    if strMatchText in strManipulate:
+        strReplaceReturn = strManipulate.replace(strMatchText, strReplace)
+        strReplaceReturn = strReplaceReturn + strInputLine[-2:] #add back EOL chars
+    return strReplaceReturn
+
 parser = build_cli_parser()
 opts, args = parser.parse_args(sys.argv[1:])
 if not opts.strinputfpath or not opts.stroutputfpath:
@@ -169,6 +177,8 @@ else:
           strOutput = replaceUnicodeChar(strOutput)
           strOutput = HexDecode(strOutput, '0x')
           strOutput = HexDecode(strOutput, '0X')
+          strOutput = replaceString(strOutput, "\n", "\\n") #don't like log entries spaning multiple lines.
+          strOutput = replaceString(strOutput, "\r", "\\r") 
           if strOutput == "":
             strOutput = "\n"
           fo.write(strOutput) #write output
