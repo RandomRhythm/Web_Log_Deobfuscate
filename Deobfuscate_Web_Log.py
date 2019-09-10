@@ -66,7 +66,7 @@ def replaceUnicodeChar(strUurl):
         for s in urllist:
             sTmpUnicode = s[:4]
             if all(c in string.hexdigits for c in sTmpUnicode):
-               seq = ('\u', sTmpUnicode )
+               seq = ('\\u', sTmpUnicode )
                strFunicode = ''.join(seq) 
                if len(s) > 4: #include everything else in string
                  seq = (strReturnWithChars,strFunicode.decode('unicode_escape'), s[len(s)-4:]) 
@@ -107,8 +107,8 @@ def HexDecode(strhURL, strHexIdentifier):
               strTmpHex = strTmpHex + strTmpChar
             else:
               break
-        if strTmpHex <> "":
-          print strTmpUlistItem, strTmpHex
+        if strTmpHex != "":
+          print (strTmpUlistItem, strTmpHex)
           if len(strTmpHex) > 1:
             strHexDecoded = strHexDecoded + binascii.unhexlify(strTmpHex) + strhURL.replace(strHexDecoded + strHexIdentifier + strTmpHex, "", 1)
           else:
@@ -130,21 +130,21 @@ def replaceChar(strEURL):
         strReturnWithChars = ""
         for s in urllist:
             strTmpPart = ""
+            #print(s)
             if ")" in s or 'CHAR(' in s:  
-              if len(s) > string.index(s, ')') + 1:
-                tmpChrCode = s[:string.index(s, ')')]
+              if len(s) > s.index(')') + 1:
+                tmpChrCode = s[:s.index(')')]
                 if tmpChrCode.isdigit():
-                    if int(s[:string.index(s, ')')]) < 257:
-                      seq = (strReturnWithChars, chr(int(s[:string.index(s, ')')])),s[string.index(s, ')') +1 -len(s):])
+                    if int(s[:s.index(')')]) < 257:
+                      seq = (strReturnWithChars, chr(int(s[:s.index(')')])),s[s.index(')') +1 -len(s):])
                       strReturnWithChars = strTmpPart.join( seq )
                     else:
-                      print (s[:string.index(s, ')')] + " is not a valid char number")
+                      print (s[:s.index(')')] + " is not a valid char number")
                       seq = (strReturnWithChars, s )
                       strReturnWithChars = strTmpPart.join(seq )                        
                 else:
-                  print ('error parsing text. Char code is not numeric')
-                  print s
-
+                  seq = (strReturnWithChars, s )
+                  strReturnWithChars = strTmpPart.join(seq )  
               else:
                   seq = (strReturnWithChars, s )
                   strReturnWithChars = strTmpPart.join(seq )
@@ -158,7 +158,7 @@ def replaceChar(strEURL):
 parser = build_cli_parser()
 opts, args = parser.parse_args(sys.argv[1:])
 if not opts.strinputfpath or not opts.stroutputfpath:
-  print "Missing required parameter"
+  print ("Missing required parameter")
   sys.exit(-1)    
 else:    
   fo = open(opts.stroutputfpath,"w") #file output
