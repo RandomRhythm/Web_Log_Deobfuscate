@@ -108,7 +108,7 @@ def HexDecode(strhURL, strHexIdentifier):
             else:
               break
         if strTmpHex != "":
-          print (strTmpUlistItem, strTmpHex)
+          #print (strTmpUlistItem, strTmpHex)
           if len(strTmpHex) > 1:
             strHexDecoded = strHexDecoded + binascii.unhexlify(strTmpHex) + strhURL.replace(strHexDecoded + strHexIdentifier + strTmpHex, "", 1)
           else:
@@ -139,8 +139,8 @@ def replaceChar(strEURL):
                       seq = (strReturnWithChars, chr(int(s[:s.index(')')])),s[s.index(')') +1 -len(s):])
                       strReturnWithChars = strTmpPart.join( seq )
                     else:
-                      print (s[:s.index(')')] + " is not a valid char number")
-                      seq = (strReturnWithChars, s )
+                      #print (s[:s.index(')')] + " is not a valid char number:" + strEURL)
+                      seq = (strReturnWithChars,'CHAR(',s[:s.index(')')] ,s[s.index(')') -len(s):])
                       strReturnWithChars = strTmpPart.join(seq )                        
                 else:
                   seq = (strReturnWithChars, s )
