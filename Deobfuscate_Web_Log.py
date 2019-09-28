@@ -1,7 +1,7 @@
 #Input a log file that contains encoded text
 #this script will replace hex (0x), ASCII, Unicode percent encoded characters, and interpreted CHAR() commands. 
 
-#Copyright (c) 2016 Ryan Boyle randomrhythm@rhythmengineering.com.
+#Copyright (c) 2019 Ryan Boyle randomrhythm@rhythmengineering.com.
 #Copyright (c) 2012 Jenny Qian.
 #All rights reserved.
 
@@ -23,8 +23,7 @@ import string
 import sys
 import binascii
 from optparse import OptionParser
-
-
+inputEncoding = "utf-8"
 
 def build_cli_parser():
     parser = OptionParser(usage="%prog [options]", description="Deobfuscate URL in log file")
@@ -32,6 +31,9 @@ def build_cli_parser():
                       help="Path to log file that will be deobfuscated")
     parser.add_option("-o", "--output", action="store", default=None, dest="stroutputfpath",
                       help="Deobfuscated log output file path")
+    parser.add_option("-l", "--loginteresting", action="store_true", default=False, dest="boolInteresting",
+                      help="True or False value if interesting encoding should be logged")
+
     return parser
 
 def urldecode(url):
@@ -69,9 +71,9 @@ def replaceUnicodeChar(strUurl):
                seq = ('\\u', sTmpUnicode )
                strFunicode = ''.join(seq) 
                if len(s) > 4: #include everything else in string
-                 seq = (strReturnWithChars,strFunicode.decode('unicode_escape'), s[len(s)-4:]) 
+                 seq = (strReturnWithChars,strFunicode.encode().decode('unicode_escape'), s[len(s)-4:]) 
                else: #string was only the unicode char
-                 seq = (strReturnWithChars,strFunicode.decode('unicode_escape'))   
+                 seq = (strReturnWithChars,strFunicode.encode().decode('unicode_escape'))   
                strReturnWithChars = ''.join(seq) 
             else: #was not hex ... could be the first line or perhaps not a properly formated URL?
               if boolFirstLine == True:
@@ -168,20 +170,34 @@ opts, args = parser.parse_args(sys.argv[1:])
 if not opts.strinputfpath or not opts.stroutputfpath:
   print ("Missing required parameter")
   sys.exit(-1)    
-else:    
-  fo = open(opts.stroutputfpath,"w") #file output
+else:
+  boolOutputSuspicious = False  
+  if opts.boolInteresting:
+    boolOutputSuspicious = opts.boolInteresting
+      
+  fo = open(opts.stroutputfpath,"w", encoding="utf-8") #file output
+  if boolOutputSuspicious == True:
+    fs = open(opts.stroutputfpath+ ".interesting","w")#log suspicious file input
 
-  with open(opts.strinputfpath) as fi: #log file input
-      for line in fi:
-          strOutput = replaceChar(urldecode(line))
-          strOutput = replaceUnicodeChar(strOutput)
-          strOutput = HexDecode(strOutput, '0x')
-          strOutput = HexDecode(strOutput, '0X')
-          strOutput = replaceString(strOutput, "\n", "\\n") #don't like log entries spaning multiple lines.
-          strOutput = replaceString(strOutput, "\r", "\\r") 
-          if strOutput == "":
-            strOutput = "\n"
-          fo.write(strOutput) #write output
+  
+  with open(opts.strinputfpath, encoding=inputEncoding) as fi: #log file input
+          for line in fi:
+              strOutput = replaceChar(urldecode(line))
+              strOutput = urldecode(strOutput)#second pass for things like %2520
+              strOutput = replaceUnicodeChar(strOutput)
+              strOutput = HexDecode(strOutput, '0x')
+              strOutput = HexDecode(strOutput, '0X')
+              strTmpCompare = line # used to identify supicious activity
+              if boolOutputSuspicious == True and strTmpCompare != strOutput:
+                if strTmpCompare.replace("%2520", " ").replace("%20", " ") != strOutput:
+                  fs.write(line) #write output
+              strOutput = replaceString(strOutput, "\n", "\\n") #don't like log entries spaning multiple lines.
+              strOutput = replaceString(strOutput, "\r", "\\r") 
+              if strOutput == "":
+                strOutput = "\n"
+              fo.write(strOutput) #write output
   fo.close()   
-  fi.close()     
+  fi.close()
+  if boolOutputSuspicious == True:
+      fs.close()
     
