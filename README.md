@@ -14,3 +14,6 @@ Options:
                         
   -o STROUTPUTFPATH, --output=STROUTPUTFPATH
                         (Deobfuscated log output file path)
+
+  -l, --loginteresting  Write interesting log entries identified with encoding
+                        to a .interesting file)
