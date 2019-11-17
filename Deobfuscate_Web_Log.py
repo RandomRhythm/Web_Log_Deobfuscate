@@ -22,7 +22,6 @@ import re
 import string
 import sys
 import binascii
-from optparse import OptionParser
 inputEncoding = "utf-8"
 
 def build_cli_parser():
@@ -112,7 +111,7 @@ def HexDecode(strhURL, strHexIdentifier):
         if strTmpHex != "":
           #print (strTmpUlistItem, strTmpHex)
           if len(strTmpHex) > 1:
-            strHexDecoded = strHexDecoded + binascii.unhexlify(strTmpHex) + strhURL.replace(strHexDecoded + strHexIdentifier + strTmpHex, "", 1)
+            strHexDecoded = strHexDecoded + binascii.unhexlify(strTmpHex).decode('unicode_escape') + strhURL.replace(strHexDecoded + strHexIdentifier + strTmpHex, "", 1)
           else:
             strHexDecoded = strHexDecoded + strTmpUlistItem
         else:
@@ -164,40 +163,3 @@ def replaceString(strInputLine, strMatchText, strReplace):
         strReplaceReturn = strManipulate.replace(strMatchText, strReplace)
         strReplaceReturn = strReplaceReturn + strInputLine[-2:] #add back EOL chars
     return strReplaceReturn
-
-parser = build_cli_parser()
-opts, args = parser.parse_args(sys.argv[1:])
-if not opts.strinputfpath or not opts.stroutputfpath:
-  print ("Missing required parameter")
-  sys.exit(-1)    
-else:
-  boolOutputSuspicious = False  
-  if opts.boolInteresting:
-    boolOutputSuspicious = opts.boolInteresting
-      
-  fo = open(opts.stroutputfpath,"w", encoding="utf-8") #file output
-  if boolOutputSuspicious == True:
-    fs = open(opts.stroutputfpath+ ".interesting","w")#log suspicious file input
-
-  
-  with open(opts.strinputfpath, encoding=inputEncoding) as fi: #log file input
-          for line in fi:
-              strOutput = replaceChar(urldecode(line))
-              strOutput = urldecode(strOutput)#second pass for things like %2520
-              strOutput = replaceUnicodeChar(strOutput)
-              strOutput = HexDecode(strOutput, '0x')
-              strOutput = HexDecode(strOutput, '0X')
-              strTmpCompare = line # used to identify supicious activity
-              if boolOutputSuspicious == True and strTmpCompare != strOutput:
-                if strTmpCompare.replace("%2520", " ").replace("%20", " ") != strOutput:
-                  fs.write(line) #write output
-              strOutput = replaceString(strOutput, "\n", "\\n") #don't like log entries spaning multiple lines.
-              strOutput = replaceString(strOutput, "\r", "\\r") 
-              if strOutput == "":
-                strOutput = "\n"
-              fo.write(strOutput) #write output
-  fo.close()   
-  fi.close()
-  if boolOutputSuspicious == True:
-      fs.close()
-    
