@@ -17,3 +17,7 @@ Options:
 
   -l, --loginteresting  Write interesting log entries identified with encoding
                         to a .interesting file)
+
+Example:
+
+process_logs.py -i .\Example_Logs\access.log -o .\Example_Logs\access.log.processed -l
