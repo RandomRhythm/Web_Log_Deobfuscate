@@ -126,13 +126,18 @@ def replaceChar(strEURL):
     """
     replace CHAR() with character
     """
-    if 'CHAR(' in strEURL:
-        urllist = strEURL.split('CHAR(')
+    strCHARACTER = ""
+    if 'CHR(' in strEURL:
+        strCHARACTER = 'CHR('
+    elif 'CHAR(' in strEURL:
+        strCHARACTER = 'CHAR('
+    if strCHARACTER != "":
+        urllist = strEURL.split(strCHARACTER)
         strReturnWithChars = ""
         for s in urllist:
             strTmpPart = ""
             #print(s)
-            if ")" in s or 'CHAR(' in s:  
+            if ")" in s or strCHARACTER in s:  
               if len(s) > s.index(')') + 1:
                 tmpChrCode = s[:s.index(')')]
                 if tmpChrCode.isdigit():
@@ -141,7 +146,7 @@ def replaceChar(strEURL):
                       strReturnWithChars = strTmpPart.join( seq )
                     else:
                       #print (s[:s.index(')')] + " is not a valid char number:" + strEURL)
-                      seq = (strReturnWithChars,'CHAR(',s[:s.index(')')] ,s[s.index(')') -len(s):])
+                      seq = (strReturnWithChars,strCHARACTER,s[:s.index(')')] ,s[s.index(')') -len(s):])
                       strReturnWithChars = strTmpPart.join(seq )                        
                 else:
                   seq = (strReturnWithChars, s )
