@@ -110,7 +110,8 @@ def HexDecode(strhURL, strHexIdentifier):
               break
         if strTmpHex != "":
           #print (strTmpUlistItem, strTmpHex)
-          if len(strTmpHex) > 1:
+          intHexLen = len(strTmpHex)
+          if intHexLen > 1 and (intHexLen % 2) == 0: #ensure proper length for conversion
             strHexDecoded = strHexDecoded + binascii.unhexlify(strTmpHex).decode('unicode_escape') + strhURL.replace(strHexDecoded + strHexIdentifier + strTmpHex, "", 1)
           else:
             strHexDecoded = strHexDecoded + strTmpUlistItem
