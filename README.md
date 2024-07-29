@@ -23,4 +23,4 @@ Example:
 process_logs.py -i .\Example_Logs\access.log -o .\Example_Logs\access.log.processed -l
 ```
 
-This code was integrated into [OWASP Access Log Parser]([URL](https://github.com/OWASP/www-project-access-log-parser))
+This code was integrated into [OWASP Access Log Parser](https://github.com/OWASP/www-project-access-log-parser)
